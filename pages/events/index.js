@@ -1,8 +1,12 @@
+import EventsList from '../../components/events/events-list';
+import {getAllEvents} from '../../dummy-store';
+
 export default function AllEventsPage() {
+  const events = getAllEvents();
+
   return (
     <>
-      <h1>All events</h1>
-      <p>Just all events</p>
+      <EventsList events={events} />
     </>
   )
 }
