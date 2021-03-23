@@ -7,21 +7,24 @@ import {getEventById} from '../../dummy-store';
 function EventDetailsPage() {
   const router = useRouter();
   const {eventId} = router.query;
-  const {date, location, image, title, description} = getEventById(eventId);
+  const event = getEventById(eventId);
+
+  if (!event) {
+    return (
+      <div>
+        <h1>...Event not found.</h1>
+      </div>
+    )
+  }
 
   return (
     <>
-      <EventSummary title={title} />
-      <EventLogistics
-        date={date}
-        address={location}
-        image={image}
-        imageAlt={title} />
+      <EventSummary title={event.title} />
+      <EventLogistics date={event.date} address={event.location} image={event.image} imageAlt={event.title} />
       <EventContent>
-        {description}
+        {event.description}
       </EventContent>
     </>
   )
 }
-
 export default EventDetailsPage;
