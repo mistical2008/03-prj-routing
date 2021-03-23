@@ -1,15 +1,13 @@
 import EventItem from './event-item';
+import styles from './events-list.module.css';
 
 function EventsList({events}) {
-  console.log(events);
 
   return (
-    <ul>
+    <ul className={styles.list}>
       {
         events.map(event => (
-          <li>
-            <EventItem event={event} />
-          </li>
+          <EventItem key={event.id} event={event} />
         ))
       }
     </ul>
