@@ -1,4 +1,8 @@
 import Link from 'next/link';
+import Button from '../ui/button';
+import IconDate from '../icons/icon-date';
+import IconAdress from '../icons/icon-adress';
+import IconArrowRight from '../icons/icon-arrow-right';
 import styles from './event-item.module.css';
 
 function EventItem({event: {id, title, location, date, image}}) {
@@ -18,14 +22,19 @@ function EventItem({event: {id, title, location, date, image}}) {
         <div>
           <h2>{title}</h2>
           <div className={styles.date}>
+            <IconDate />
             <time>{readableDate}</time>
           </div>
           <div className={styles.address}>
+            <IconAdress />
             <address>{address}</address>
           </div>
         </div>
-        <div>
-          <Link href={exploreLink}>Explore Event</Link>
+        <div className={styles.actions}>
+          <Button link={exploreLink}>
+            <span> Explore Event </span>
+            <span className={styles.icon}> <IconArrowRight /> </span>
+          </Button>
         </div>
       </div>
     </li>
