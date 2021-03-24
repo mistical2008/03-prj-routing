@@ -1,5 +1,8 @@
 import { useRouter } from "next/router";
 import EventsList from "../../components/events/events-list";
+import EventsTitle from "../../components/events/results-title";
+import Button from "../../components/ui/button";
+import ErrorAlert from "../../components/ui/error-alert";
 import { getFilteredEvents } from "../../dummy-store";
 
 export default function FilteredEventsPage() {
@@ -9,30 +12,57 @@ export default function FilteredEventsPage() {
   } = router.query;
   const yearNum = Number(year);
   const monthNum = Number(month);
+  const date = new Date(yearNum, monthNum - 1);
   const filteredEvents = getFilteredEvents({ year: yearNum, month: monthNum });
   console.log(router.query);
 
   // Validate parameters and return error alert:
-  if (isNaN(yearNum) || isNaN(monthNum) || !year || !month) {
+  if (!year && !month) {
     return (
-      <div>
-        <p>Filter error. Update your search parameters.</p>
+      <div className="center">
+        <p>...Loading</p>
       </div>
+    );
+  }
+
+  // Validate parameters and return error alert:
+  if (
+    isNaN(yearNum) ||
+    isNaN(monthNum) ||
+    yearNum > 2030 ||
+    yearNum < 2021 ||
+    monthNum < 1 ||
+    monthNum > 12
+  ) {
+    return (
+      <>
+        <ErrorAlert>
+          <p>Filter error. Update your search values.</p>
+        </ErrorAlert>
+        <div className="center">
+          <Button link="/events">Show All Events</Button>
+        </div>
+      </>
     );
   }
 
   // Check for empty results and return fallback:
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
-      <div>
-        <p>No events for your query</p>
-      </div>
+      <>
+        <ErrorAlert>
+          <p>No events for the choosen filter</p>
+        </ErrorAlert>
+        <div className="center">
+          <Button link="/events">Show All Events</Button>
+        </div>
+      </>
     );
   }
 
   return (
     <>
-      <h1>Filtered events</h1>
+      <EventsTitle date={date} />
       <EventsList events={filteredEvents} />
     </>
   );
