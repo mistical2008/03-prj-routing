@@ -1,9 +1,9 @@
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 import EventsList from "../../components/events/events-list";
 import EventsTitle from "../../components/events/results-title";
 import Button from "../../components/ui/button";
 import ErrorAlert from "../../components/ui/error-alert";
-import { getFilteredEvents } from "../../dummy-store";
+// import {getFilteredEvents} from "../../dummy-store";
 
 export default function FilteredEventsPage() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export default function FilteredEventsPage() {
   const yearNum = Number(year);
   const monthNum = Number(month);
   const date = new Date(yearNum, monthNum - 1);
-  const filteredEvents = getFilteredEvents({ year: yearNum, month: monthNum });
+  const filteredEvents = getFilteredEvents({year: yearNum, month: monthNum});
   console.log(router.query);
 
   // Validate parameters and return error alert:

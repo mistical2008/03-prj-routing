@@ -39,6 +39,7 @@ export function getAllEvents() {
   return DUMMY_EVENTS;
 }
 
+
 export function getFilteredEvents(dateFilter) {
   const {year, month} = dateFilter;
 
