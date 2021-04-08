@@ -1,39 +1,22 @@
-import {useRouter} from "next/router";
+import {getFilteredEvents} from '../../helpers/api-utils';
 import EventsList from "../../components/events/events-list";
 import EventsTitle from "../../components/events/results-title";
 import Button from "../../components/ui/button";
 import ErrorAlert from "../../components/ui/error-alert";
 // import {getFilteredEvents} from "../../dummy-store";
 
-export default function FilteredEventsPage() {
-  const router = useRouter();
-  const {
-    slug: [year, month],
-  } = router.query;
-  const yearNum = Number(year);
-  const monthNum = Number(month);
-  const date = new Date(yearNum, monthNum - 1);
-  const filteredEvents = getFilteredEvents({year: yearNum, month: monthNum});
-  console.log(router.query);
+function FilteredEventsPage(props) {
+  const {events, hasError, year, month, slug} = props;
 
-  // Validate parameters and return error alert:
-  if (!year && !month) {
+  if (!events) {
     return (
-      <div className="center">
-        <p>...Loading</p>
-      </div>
+      <>
+        <div className="center">Loading...</div>
+      </>
     );
   }
-
   // Validate parameters and return error alert:
-  if (
-    isNaN(yearNum) ||
-    isNaN(monthNum) ||
-    yearNum > 2030 ||
-    yearNum < 2021 ||
-    monthNum < 1 ||
-    monthNum > 12
-  ) {
+  if (hasError) {
     return (
       <>
         <ErrorAlert>
@@ -47,7 +30,7 @@ export default function FilteredEventsPage() {
   }
 
   // Check for empty results and return fallback:
-  if (!filteredEvents || filteredEvents.length === 0) {
+  if (!events || events.length === 0) {
     return (
       <>
         <ErrorAlert>
@@ -60,10 +43,35 @@ export default function FilteredEventsPage() {
     );
   }
 
+  const date = new Date(year, month - 1);
   return (
     <>
       <EventsTitle date={date} />
-      <EventsList events={filteredEvents} />
+      <EventsList events={events} />
     </>
   );
 }
+
+export async function getServerSideProps(context) {
+  const {
+    slug: [year, month],
+  } = context.params;
+
+  const yearNum = Number(year);
+  const monthNum = Number(month);
+  const events = await getFilteredEvents({year: yearNum, month: monthNum});
+
+  if (!year && !month) {
+    return {props: {hasError: true}};
+  }
+
+  return {
+    props: {
+      events,
+      month: monthNum,
+      year: yearNum,
+    }
+  }
+}
+
+export default FilteredEventsPage;

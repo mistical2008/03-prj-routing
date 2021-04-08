@@ -1,21 +1,25 @@
 import EventsList from "../components/events/events-list";
+import EventsTitle from '../components/events/results-title';
 import {eventsObjToArray, getFeaturedEvents} from "../helpers/api-utils";
 import {fetchAllEvents} from "../helpers/api-utils";
 
 function HomePage({events}) {
   if (!events) return <div>Loading...</div>
+  const date = Date.now();
 
   return (
     <>
+      <div className="center">
+        <EventsTitle date={date} />
+      </div>
       <EventsList events={events} />
     </>
   )
 }
 
 export async function getStaticProps() {
-  const link = process.env.DB_EVENTS_LINK;
-  const events = getFeaturedEvents( 
-    await fetchAllEvents(link, eventsObjToArray) 
+  const events = getFeaturedEvents(
+    await fetchAllEvents(eventsObjToArray)
   );
 
   return {

@@ -54,3 +54,13 @@ export function getFilteredEvents(dateFilter) {
 export function getEventById(id) {
   return DUMMY_EVENTS.find((event) => event.id === id);
 }
+
+export function getTodayDate() {
+  // const options = {month: "long"}
+  const date = new Date();
+  return {
+    year: date.getFullYear(),
+    month: date.getMonth() + 1,
+    day: date.getDate(),
+  }
+}

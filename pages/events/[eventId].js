@@ -29,8 +29,7 @@ function EventDetailsPage({event}) {
 }
 
 export async function getStaticPaths() {
-  const link = process.env.DB_EVENTS_LINK;
-  const events = await fetchAllEvents(link, eventsObjToArray);
+  const events = await fetchAllEvents(eventsObjToArray);
   const data = Object.keys(
     getFeaturedEvents(events))
     .map(eventId => ({params: {eventId}}
@@ -43,8 +42,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps(context) {
   const {params: {eventId}} = context;
-  const link = process.env.DB_EVENTS_LINK;
-  const events = await fetchAllEvents(link, eventsObjToArray);
+  const events = await fetchAllEvents(eventsObjToArray);
   const event = getEventById(events, eventId);
   return {
     props: {
