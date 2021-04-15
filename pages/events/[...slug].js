@@ -1,22 +1,37 @@
-import {getFilteredEvents} from '../../helpers/api-utils';
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+// import {
+// eventsObjToArray,
+// fetchAllEvents,
+// getFilteredEvents,
+// } from "../../helpers/api-utils";
 import EventsList from "../../components/events/events-list";
 import EventsTitle from "../../components/events/results-title";
 import Button from "../../components/ui/button";
 import ErrorAlert from "../../components/ui/error-alert";
 // import {getFilteredEvents} from "../../dummy-store";
 
-function FilteredEventsPage(props) {
-  const {events, hasError, year, month, slug} = props;
+function FilteredEventsPage() {
+  const router = useRouter();
+  // console.log(router.query);
+  const [year, month] = router.query.slug;
+  const [loadedEvents, setLoadedEvents] = useState();
 
-  if (!events) {
-    return (
-      <>
-        <div className="center">Loading...</div>
-      </>
-    );
-  }
-  // Validate parameters and return error alert:
-  if (hasError) {
+  const yearNum = Number(year);
+  const monthNum = Number(month);
+
+  // validate query params before fetching data
+  // in case to feedback user and not send unneeded request to server
+  if (
+    isNaN(yearNum) ||
+    isNaN(monthNum) ||
+    yearNum > 2030 ||
+    yearNum < 2021 ||
+    monthNum < 1 ||
+    monthNum > 12 ||
+    error
+  ) {
     return (
       <>
         <ErrorAlert>
@@ -29,8 +44,46 @@ function FilteredEventsPage(props) {
     );
   }
 
+  const { data, error } = useSWR(
+    "https://nextjs-test-c75bc-default-rtdb.europe-west1.firebasedatabase.app/events.json"
+  );
+  // console.log(data);
+
+  useEffect(() => {
+    if (data) {
+      //transformation logic
+      const events = Object.keys(data).map((id) => {
+        console.log(data[id]);
+        return {
+          ...data[id],
+          id: id,
+        };
+      });
+
+      setLoadedEvents(events);
+    }
+  }, [data]);
+
+  // As useSWR do async work and loadedEvents undefined
+  // respond to user with loading status
+  if (!year || !month || !loadedEvents) {
+    return (
+      <>
+        <div className="center">Loading...</div>
+      </>
+    );
+  }
+
+  const filteredEvents = loadedEvents.filter((event) => {
+    const eventDate = new Date(event.date);
+    return (
+      eventDate.getFullYear() === yearNum &&
+      eventDate.getMonth() === monthNum - 1
+    );
+  });
+
   // Check for empty results and return fallback:
-  if (!events || events.length === 0) {
+  if (!filteredEvents || filteredEvents.length === 0) {
     return (
       <>
         <ErrorAlert>
@@ -43,35 +96,37 @@ function FilteredEventsPage(props) {
     );
   }
 
-  const date = new Date(year, month - 1);
+  // Validate parameters and return error alert:
+
+  const date = new Date(yearNum, monthNum - 1);
   return (
     <>
       <EventsTitle date={date} />
-      <EventsList events={events} />
+      <EventsList events={filteredEvents} />
     </>
   );
 }
 
-export async function getServerSideProps(context) {
-  const {
-    slug: [year, month],
-  } = context.params;
-
-  const yearNum = Number(year);
-  const monthNum = Number(month);
-  const events = await getFilteredEvents({year: yearNum, month: monthNum});
-
-  if (!year && !month) {
-    return {props: {hasError: true}};
-  }
-
-  return {
-    props: {
-      events,
-      month: monthNum,
-      year: yearNum,
-    }
-  }
-}
+// export async function getServerSideProps(context) {
+// const {
+// slug: [year, month],
+// } = context.params;
+//
+// const yearNum = Number(year);
+// const monthNum = Number(month);
+// const events = await getFilteredEvents({ year: yearNum, month: monthNum });
+//
+// if (!year && !month) {
+// return { props: { hasError: true } };
+// }
+//
+// return {
+// props: {
+// events,
+// month: monthNum,
+// year: yearNum,
+// },
+// };
+// }
 
 export default FilteredEventsPage;
