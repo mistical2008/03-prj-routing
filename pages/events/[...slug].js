@@ -10,11 +10,10 @@ import EventsList from "../../components/events/events-list";
 import EventsTitle from "../../components/events/results-title";
 import Button from "../../components/ui/button";
 import ErrorAlert from "../../components/ui/error-alert";
-// import {getFilteredEvents} from "../../dummy-store";
+import Head from "next/head";
 
 function FilteredEventsPage() {
   const router = useRouter();
-  // console.log(router.query);
   const [year, month] = router.query.slug;
   const [loadedEvents, setLoadedEvents] = useState();
 
@@ -97,36 +96,18 @@ function FilteredEventsPage() {
   }
 
   // Validate parameters and return error alert:
-
   const date = new Date(yearNum, monthNum - 1);
   return (
     <>
+      <Head>
+        <title>
+          Events for {monthNum}/{yearNum}
+        </title>
+      </Head>
       <EventsTitle date={date} />
       <EventsList events={filteredEvents} />
     </>
   );
 }
-
-// export async function getServerSideProps(context) {
-// const {
-// slug: [year, month],
-// } = context.params;
-//
-// const yearNum = Number(year);
-// const monthNum = Number(month);
-// const events = await getFilteredEvents({ year: yearNum, month: monthNum });
-//
-// if (!year && !month) {
-// return { props: { hasError: true } };
-// }
-//
-// return {
-// props: {
-// events,
-// month: monthNum,
-// year: yearNum,
-// },
-// };
-// }
 
 export default FilteredEventsPage;
